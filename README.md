@@ -1,1 +1,1 @@
-# AI-agent-for-farming
+# AI-Agent-Smart-Farming

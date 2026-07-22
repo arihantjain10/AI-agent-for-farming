@@ -1,0 +1,1181 @@
+
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AI Smart Farming Agent — IBM watsonx</title>
+<style>
+/* ============================================================
+   DESIGN TOKENS — IBM watsonx-inspired green / white / blue
+   ============================================================ */
+:root {
+  --green-900: #071c0f;
+  --green-800: #0a2e18;
+  --green-700: #0d4422;
+  --green-600: #136327;
+  --green-500: #198038;
+  --green-400: #24a148;
+  --green-300: #42be65;
+  --green-200: #a7f0ba;
+  --green-100: #defbe6;
+  --blue-700:  #0043ce;
+  --blue-600:  #0f62fe;
+  --blue-500:  #4589ff;
+  --blue-200:  #a6c8ff;
+  --blue-100:  #edf5ff;
+  --teal-400:  #009d9a;
+  --teal-300:  #08bdba;
+  --white:     #ffffff;
+  --gray-10:   #f4f4f4;
+  --gray-20:   #e0e0e0;
+  --gray-40:   #a8a8a8;
+  --gray-60:   #6f6f6f;
+  --gray-80:   #393939;
+  --gray-90:   #262626;
+  --gray-100:  #161616;
+
+  --font: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --radius-sm: 6px;
+  --radius:    12px;
+  --radius-lg: 20px;
+  --shadow-sm: 0 2px 8px rgba(0,0,0,.08);
+  --shadow:    0 4px 20px rgba(0,0,0,.12);
+  --shadow-lg: 0 8px 40px rgba(0,0,0,.18);
+  --transition: all .25s cubic-bezier(.4,0,.2,1);
+}
+
+/* ── Reset ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font);
+  background: var(--gray-10);
+  color: var(--gray-100);
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--gray-20); }
+::-webkit-scrollbar-thumb { background: var(--green-400); border-radius: 3px; }
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+header {
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  background: rgba(7, 28, 15, 0.97);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(36,161,72,.25);
+}
+
+.header-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 24px;
+  height: 68px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+/* Logo block */
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  text-decoration: none;
+}
+
+.logo-mark {
+  width: 44px;
+  height: 44px;
+  background: linear-gradient(135deg, var(--green-400) 0%, var(--teal-400) 100%);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+  box-shadow: 0 0 0 3px rgba(36,161,72,.25);
+}
+
+.logo-copy { line-height: 1.2; }
+.logo-copy .name {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--white);
+  letter-spacing: -.3px;
+}
+.logo-copy .sub {
+  font-size: 11px;
+  color: var(--green-300);
+  font-weight: 400;
+}
+
+/* Desktop nav */
+nav { display: flex; gap: 4px; }
+nav a {
+  color: var(--green-200);
+  text-decoration: none;
+  font-size: 13px;
+  padding: 7px 13px;
+  border-radius: var(--radius-sm);
+  transition: var(--transition);
+  white-space: nowrap;
+}
+nav a:hover { background: rgba(36,161,72,.15); color: var(--white); }
+
+/* IBM badge */
+.ibm-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(15,98,254,.12);
+  border: 1px solid rgba(69,137,255,.3);
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 11px;
+  color: var(--blue-200);
+  white-space: nowrap;
+}
+.ibm-badge .live-dot {
+  width: 7px; height: 7px;
+  background: var(--green-300);
+  border-radius: 50%;
+  animation: blink 2s ease-in-out infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+/* ============================================================
+   HERO SECTION
+   ============================================================ */
+.hero {
+  background: linear-gradient(160deg,
+    var(--green-900) 0%,
+    var(--green-800) 35%,
+    #0a1a2e 70%,
+    #071228 100%);
+  padding: 90px 24px 80px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* decorative rings */
+.hero::before, .hero::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid rgba(36,161,72,.12);
+  pointer-events: none;
+}
+.hero::before {
+  width: 700px; height: 700px;
+  top: -250px; right: -200px;
+}
+.hero::after {
+  width: 400px; height: 400px;
+  bottom: -150px; left: -100px;
+  border-color: rgba(15,98,254,.1);
+}
+
+.hero-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+}
+
+.hero-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: rgba(36,161,72,.15);
+  border: 1px solid rgba(36,161,72,.35);
+  color: var(--green-300);
+  font-size: 12px;
+  font-weight: 500;
+  padding: 5px 13px;
+  border-radius: 20px;
+  margin-bottom: 22px;
+  letter-spacing: .3px;
+}
+
+.hero h1 {
+  font-size: clamp(30px, 4vw, 52px);
+  font-weight: 700;
+  color: var(--white);
+  line-height: 1.15;
+  letter-spacing: -.5px;
+  margin-bottom: 20px;
+}
+
+.hero h1 span {
+  background: linear-gradient(90deg, var(--green-300), var(--teal-300));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero p {
+  font-size: 17px;
+  color: rgba(255,255,255,.7);
+  line-height: 1.75;
+  max-width: 520px;
+  margin-bottom: 36px;
+}
+
+/* CTA buttons */
+.hero-cta { display: flex; gap: 12px; flex-wrap: wrap; }
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--green-400);
+  color: var(--white);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: 600;
+  padding: 13px 24px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: var(--transition);
+  box-shadow: 0 4px 16px rgba(36,161,72,.35);
+}
+.btn-primary:hover {
+  background: var(--green-500);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 24px rgba(36,161,72,.45);
+}
+
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  color: var(--white);
+  border: 1px solid rgba(255,255,255,.3);
+  border-radius: var(--radius-sm);
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: 500;
+  padding: 12px 24px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: var(--transition);
+}
+.btn-outline:hover { border-color: var(--white); background: rgba(255,255,255,.07); }
+
+/* Hero visual panel */
+.hero-visual {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.hero-stat-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.hero-stat {
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  text-align: center;
+  backdrop-filter: blur(8px);
+  transition: var(--transition);
+}
+.hero-stat:hover { background: rgba(255,255,255,.1); border-color: rgba(36,161,72,.4); }
+.hero-stat .stat-n { font-size: 32px; font-weight: 700; color: var(--green-300); }
+.hero-stat .stat-l { font-size: 12px; color: rgba(255,255,255,.55); margin-top: 4px; }
+
+.hero-banner {
+  background: linear-gradient(135deg, rgba(15,98,254,.15), rgba(36,161,72,.1));
+  border: 1px solid rgba(15,98,254,.25);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--blue-200);
+  font-size: 13px;
+  line-height: 1.5;
+  backdrop-filter: blur(8px);
+}
+.hero-banner .b-icon { font-size: 24px; flex-shrink: 0; }
+
+/* ============================================================
+   SECTION WRAPPER
+   ============================================================ */
+.section { padding: 80px 24px; }
+.section-alt { background: var(--white); }
+
+.section-inner { max-width: 1280px; margin: 0 auto; }
+
+.section-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--green-500);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .8px;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.section-title {
+  font-size: clamp(24px, 3vw, 38px);
+  font-weight: 700;
+  color: var(--gray-100);
+  letter-spacing: -.4px;
+  margin-bottom: 14px;
+  line-height: 1.2;
+}
+
+.section-desc {
+  font-size: 16px;
+  color: var(--gray-60);
+  max-width: 600px;
+  line-height: 1.7;
+  margin-bottom: 48px;
+}
+
+/* ============================================================
+   FEATURE CARDS
+   ============================================================ */
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+.feature-card {
+  background: var(--white);
+  border: 1px solid var(--gray-20);
+  border-radius: var(--radius-lg);
+  padding: 28px 24px;
+  position: relative;
+  overflow: hidden;
+  transition: var(--transition);
+  cursor: default;
+}
+.feature-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, transparent 60%, rgba(36,161,72,.04));
+  pointer-events: none;
+}
+.feature-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--green-300);
+}
+
+.fc-icon {
+  width: 52px; height: 52px;
+  border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px;
+  margin-bottom: 18px;
+}
+.fc-icon.green  { background: var(--green-100); }
+.fc-icon.blue   { background: var(--blue-100); }
+.fc-icon.teal   { background: #e5f6f6; }
+.fc-icon.orange { background: #fff2e8; }
+
+.fc-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--gray-100);
+  margin-bottom: 8px;
+}
+
+.fc-desc {
+  font-size: 14px;
+  color: var(--gray-60);
+  line-height: 1.65;
+  margin-bottom: 18px;
+}
+
+.fc-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.fc-tag {
+  background: var(--gray-10);
+  color: var(--gray-60);
+  font-size: 11px;
+  padding: 3px 9px;
+  border-radius: 10px;
+  border: 1px solid var(--gray-20);
+}
+
+/* ============================================================
+   QUICK SUGGESTION CHIPS
+   ============================================================ */
+.chips-section {
+  background: linear-gradient(135deg, var(--green-900), #0a1a2e);
+  padding: 60px 24px;
+}
+
+.chips-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.chips-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--white);
+  margin-bottom: 8px;
+}
+.chips-sub { font-size: 14px; color: rgba(255,255,255,.5); margin-bottom: 28px; }
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255,255,255,.07);
+  border: 1px solid rgba(255,255,255,.15);
+  color: var(--white);
+  font-family: var(--font);
+  font-size: 13px;
+  padding: 9px 18px;
+  border-radius: 24px;
+  cursor: pointer;
+  transition: var(--transition);
+  text-decoration: none;
+}
+.chip:hover {
+  background: rgba(36,161,72,.2);
+  border-color: var(--green-400);
+  color: var(--green-200);
+  transform: translateY(-2px);
+}
+.chip .chip-icon { font-size: 15px; }
+
+/* ============================================================
+   AI ASSISTANT SECTION  —  the IBM Orchestrate widget lives here
+   ============================================================ */
+.assistant-section {
+  background: linear-gradient(180deg, #f0faf3 0%, var(--white) 100%);
+  padding: 80px 24px;
+}
+
+.assistant-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.assistant-header { text-align: center; margin-bottom: 40px; }
+
+/* Animated border ring around the widget container */
+.widget-wrapper {
+  position: relative;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.widget-wrapper::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: calc(var(--radius-lg) + 2px);
+  background: linear-gradient(135deg, var(--green-400), var(--blue-600), var(--teal-400), var(--green-400));
+  background-size: 300% 300%;
+  animation: gradShift 6s ease infinite;
+  z-index: 0;
+}
+
+@keyframes gradShift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* The actual #root div that IBM Orchestrate renders into */
+#root {
+  position: relative;
+  z-index: 1;
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  min-height: 600px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Placeholder shown while the widget loads */
+.root-placeholder {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--gray-60);
+  pointer-events: none;
+  user-select: none;
+}
+.root-placeholder .pl-icon { font-size: 48px; margin-bottom: 16px; animation: float 3s ease-in-out infinite; }
+@keyframes float {
+  0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)}
+}
+.root-placeholder h3 { font-size: 20px; font-weight: 600; color: var(--gray-80); margin-bottom: 8px; }
+.root-placeholder p  { font-size: 14px; color: var(--gray-60); }
+
+/* Capability badges under the widget */
+.widget-caps {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.cap-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--white);
+  border: 1px solid var(--gray-20);
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 12px;
+  color: var(--gray-60);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ============================================================
+   HOW IT WORKS
+   ============================================================ */
+.steps-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 28px;
+  position: relative;
+}
+
+/* connecting line (desktop) */
+.steps-grid::before {
+  content: '';
+  position: absolute;
+  top: 36px; left: calc(200px / 2);
+  right: calc(200px / 2);
+  height: 2px;
+  background: linear-gradient(90deg, var(--green-300), var(--blue-500));
+  z-index: 0;
+  opacity: .35;
+}
+
+.step {
+  text-align: center;
+  position: relative;
+  z-index: 1;
+  padding: 0 10px;
+}
+
+.step-num {
+  width: 52px; height: 52px;
+  background: linear-gradient(135deg, var(--green-400), var(--teal-400));
+  color: var(--white);
+  font-size: 20px;
+  font-weight: 700;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 16px;
+  box-shadow: 0 4px 14px rgba(36,161,72,.35);
+}
+
+.step-title { font-size: 15px; font-weight: 600; color: var(--gray-100); margin-bottom: 8px; }
+.step-desc  { font-size: 13px; color: var(--gray-60); line-height: 1.6; }
+
+/* ============================================================
+   BENEFITS
+   ============================================================ */
+.benefits-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.benefit-card {
+  background: linear-gradient(135deg, var(--green-900), #0d1f35);
+  border: 1px solid rgba(36,161,72,.2);
+  border-radius: var(--radius-lg);
+  padding: 28px 24px;
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  transition: var(--transition);
+}
+.benefit-card:hover { border-color: var(--green-400); transform: translateY(-3px); }
+
+.benefit-icon {
+  width: 44px; height: 44px;
+  background: rgba(36,161,72,.15);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.benefit-text .b-title { font-size: 15px; font-weight: 600; color: var(--white); margin-bottom: 6px; }
+.benefit-text .b-desc  { font-size: 13px; color: rgba(255,255,255,.55); line-height: 1.6; }
+
+/* ============================================================
+   AI CAPABILITIES STRIP
+   ============================================================ */
+.capabilities-section {
+  background: var(--gray-10);
+  padding: 80px 24px;
+}
+
+.cap-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 14px;
+}
+
+.cap-card {
+  background: var(--white);
+  border: 1px solid var(--gray-20);
+  border-radius: var(--radius);
+  padding: 20px 16px;
+  text-align: center;
+  transition: var(--transition);
+}
+.cap-card:hover {
+  border-color: var(--green-400);
+  box-shadow: var(--shadow);
+  transform: translateY(-3px);
+}
+.cap-card .cc-icon { font-size: 28px; margin-bottom: 10px; }
+.cap-card .cc-name { font-size: 13px; font-weight: 600; color: var(--gray-80); }
+.cap-card .cc-tech { font-size: 11px; color: var(--green-500); margin-top: 4px; }
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+footer {
+  background: var(--green-900);
+  border-top: 1px solid rgba(36,161,72,.2);
+  padding: 56px 24px 32px;
+}
+
+.footer-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.footer-top {
+  display: grid;
+  grid-template-columns: 1.5fr repeat(3, 1fr);
+  gap: 40px;
+  margin-bottom: 48px;
+}
+
+.footer-brand .fb-name {
+  font-size: 18px; font-weight: 700; color: var(--white); margin: 12px 0 8px;
+}
+.footer-brand .fb-desc { font-size: 13px; color: rgba(255,255,255,.45); line-height: 1.65; }
+
+.footer-col h4 {
+  font-size: 12px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: .8px; color: var(--green-300); margin-bottom: 14px;
+}
+.footer-col ul { list-style: none; }
+.footer-col li { margin-bottom: 8px; }
+.footer-col a {
+  color: rgba(255,255,255,.5); font-size: 13px; text-decoration: none;
+  transition: color .2s;
+}
+.footer-col a:hover { color: var(--green-300); }
+
+.footer-bottom {
+  border-top: 1px solid rgba(255,255,255,.08);
+  padding-top: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.footer-bottom p { font-size: 12px; color: rgba(255,255,255,.3); }
+.footer-tech { display: flex; gap: 10px; flex-wrap: wrap; }
+.tech-pill {
+  background: rgba(255,255,255,.07);
+  border: 1px solid rgba(255,255,255,.12);
+  color: rgba(255,255,255,.4);
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 10px;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 1024px) {
+  .hero-inner { grid-template-columns: 1fr; gap: 40px; }
+  .hero-visual { display: none; }
+  .footer-top { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 640px) {
+  nav { display: none; }
+  .ibm-badge { display: none; }
+  .hero { padding: 60px 20px; }
+  .section { padding: 56px 20px; }
+  .footer-top { grid-template-columns: 1fr; }
+  .steps-grid::before { display: none; }
+}
+
+/* ============================================================
+   UTILITY — fade-in on scroll
+   ============================================================ */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity .6s ease, transform .6s ease;
+}
+.reveal.visible {
+  opacity: 1;
+  transform: none;
+}
+</style>
+</head>
+<body>
+
+
+<header>
+  <div class="header-inner">
+    
+    <a href="#" class="logo">
+      <div class="logo-mark">🌾</div>
+      <div class="logo-copy">
+        <div class="name">AI Smart Farming Agent</div>
+        <div class="sub">Powered by IBM watsonx Orchestrate &amp; IBM Granite</div>
+      </div>
+    </a>
+
+    
+    <nav>
+      <a href="#features">Features</a>
+      <a href="#assistant">AI Assistant</a>
+      <a href="#how-it-works">How It Works</a>
+      <a href="#benefits">Benefits</a>
+    </nav>
+
+    
+    <div class="ibm-badge">
+      <div class="live-dot"></div>
+      watsonx Orchestrate · Live
+    </div>
+  </div>
+</header>
+
+
+<section class="hero">
+  <div class="hero-inner">
+    
+    <div class="hero-copy reveal">
+      <div class="hero-tag">
+        <span>🤖</span> IBM watsonx · IBM Granite · RAG
+      </div>
+      <h1>Your Personal<br /><span>AI Smart Farming</span><br />Assistant</h1>
+      <p>
+        Get personalized advice on crop selection, weather forecasting, irrigation
+        planning, pest detection, soil health, fertilizer recommendations, market
+        prices, and sustainable farming — all powered by IBM Granite AI.
+      </p>
+      <div class="hero-cta">
+        <a href="#assistant" class="btn-primary">🤖 Chat with AgriBot</a>
+        <a href="#features" class="btn-outline">Explore Features →</a>
+      </div>
+    </div>
+
+    
+    <div class="hero-visual reveal" style="transition-delay:.15s">
+      <div class="hero-stat-grid">
+        <div class="hero-stat"><div class="stat-n">40+</div><div class="stat-l">Crop Varieties Supported</div></div>
+        <div class="hero-stat"><div class="stat-n">24/7</div><div class="stat-l">AI Advisor Available</div></div>
+        <div class="hero-stat"><div class="stat-n">7-Day</div><div class="stat-l">Weather Forecasting</div></div>
+        <div class="hero-stat"><div class="stat-n">RAG</div><div class="stat-l">Knowledge Retrieval</div></div>
+      </div>
+      <div class="hero-banner">
+        <div class="b-icon">⚡</div>
+        <div>
+          <strong style="color:#fff;display:block;margin-bottom:2px">IBM Granite Models Active</strong>
+          Responses powered by <em style="color:#a7f0ba">ibm/granite-3-8b-instruct</em> via watsonx.ai
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="section section-alt" id="features">
+  <div class="section-inner">
+    <div class="reveal">
+      <div class="section-label">✦ Core Capabilities</div>
+      <h2 class="section-title">Everything Your Farm Needs</h2>
+      <p class="section-desc">
+        From seed selection to harvest planning, AgriBot covers every critical
+        decision point of your farming journey.
+      </p>
+    </div>
+
+    <div class="feature-grid">
+      
+      <div class="feature-card reveal">
+        <div class="fc-icon green">🌾</div>
+        <div class="fc-title">Crop Advisory</div>
+        <div class="fc-desc">
+          Get AI-powered crop selection recommendations tailored to your soil type,
+          climate zone, water availability, and market demand.
+        </div>
+        <div class="fc-tags">
+          <span class="fc-tag">Soil Analysis</span>
+          <span class="fc-tag">Season Planning</span>
+          <span class="fc-tag">Yield Forecast</span>
+        </div>
+      </div>
+
+      
+      <div class="feature-card reveal" style="transition-delay:.1s">
+        <div class="fc-icon blue">🌦</div>
+        <div class="fc-title">Weather &amp; Irrigation</div>
+        <div class="fc-desc">
+          Real-time weather forecasts and precision irrigation schedules to
+          optimize water use and protect crops from climate risks.
+        </div>
+        <div class="fc-tags">
+          <span class="fc-tag">7-Day Forecast</span>
+          <span class="fc-tag">Drip Irrigation</span>
+          <span class="fc-tag">ET0 Calculation</span>
+        </div>
+      </div>
+
+      
+      <div class="feature-card reveal" style="transition-delay:.2s">
+        <div class="fc-icon teal">🐛</div>
+        <div class="fc-title">Pest &amp; Disease Detection</div>
+        <div class="fc-desc">
+          Upload crop images to instantly identify pests, fungal diseases, or
+          nutrient deficiencies with actionable treatment plans.
+        </div>
+        <div class="fc-tags">
+          <span class="fc-tag">Image Upload</span>
+          <span class="fc-tag">IPM Advice</span>
+          <span class="fc-tag">Fungicide Guide</span>
+        </div>
+      </div>
+
+      
+      <div class="feature-card reveal" style="transition-delay:.3s">
+        <div class="fc-icon orange">📈</div>
+        <div class="fc-title">Market Insights</div>
+        <div class="fc-desc">
+          Live commodity prices, 4-week demand forecasts, and buy/hold/sell
+          signals to help you time your harvest and sales perfectly.
+        </div>
+        <div class="fc-tags">
+          <span class="fc-tag">Price Trends</span>
+          <span class="fc-tag">MSP Alerts</span>
+          <span class="fc-tag">Trade Signals</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="chips-section">
+  <div class="chips-inner reveal">
+    <div class="chips-title">💬 Ask AgriBot Anything</div>
+    <div class="chips-sub">Tap a topic below to start a conversation with your AI farming assistant</div>
+    <div class="chips">
+      <a href="#assistant" class="chip"><span class="chip-icon">🌱</span> Which crop is best for my soil?</a>
+      <a href="#assistant" class="chip"><span class="chip-icon">🌤</span> Weather forecast for my location</a>
+      <a href="#assistant" class="chip"><span class="chip-icon">📷</span> Detect disease from crop image</a>
+      <a href="#assistant" class="chip"><span class="chip-icon">🌿</span> Recommend fertilizer</a>
+      <a href="#assistant" class="chip"><span class="chip-icon">💧</span> Irrigation schedule</a>
+      <a href="#assistant" class="chip"><span class="chip-icon">📊</span> Today's crop market price</a>
+      <a href="#assistant" class="chip"><span class="chip-icon">📋</span> Government agriculture schemes</a>
+      <a href="#assistant" class="chip"><span class="chip-icon">♻️</span> Sustainable farming tips</a>
+    </div>
+  </div>
+</section>
+
+
+<section class="assistant-section" id="assistant">
+  <div class="assistant-inner">
+
+    
+    <div class="assistant-header reveal">
+      <div class="section-label" style="justify-content:center">🤖 AI Assistant</div>
+      <h2 class="section-title" style="text-align:center">Chat with Your Farming AI</h2>
+      <p class="section-desc" style="margin:0 auto 32px;text-align:center">
+        Powered by IBM watsonx Orchestrate and IBM Granite. Ask any question about
+        your farm — the AI handles crops, weather, pests, soil, markets, and more.
+      </p>
+    </div>
+
+    
+    <div class="widget-wrapper reveal" style="transition-delay:.1s">
+      
+      <div id="root">
+        
+        <div class="root-placeholder" id="rootPlaceholder">
+          <div class="pl-icon">🌾</div>
+          <h3>AgriBot is Starting…</h3>
+          <p>IBM watsonx Orchestrate is loading your AI farming assistant.</p>
+        </div>
+      </div>
+    </div>
+
+    
+    <div class="widget-caps reveal" style="transition-delay:.2s">
+      <span class="cap-badge">🌾 Crop Recommendations</span>
+      <span class="cap-badge">🌦 Weather Information</span>
+      <span class="cap-badge">🌱 Soil &amp; Fertilizer Advice</span>
+      <span class="cap-badge">🐛 Pest &amp; Disease Guidance</span>
+      <span class="cap-badge">📈 Market Prices</span>
+      <span class="cap-badge">📋 Government Advisories</span>
+      <span class="cap-badge">📷 Image Upload</span>
+      <span class="cap-badge">💬 Chat History</span>
+    </div>
+
+  </div>
+</section>
+
+
+<section class="section section-alt" id="how-it-works">
+  <div class="section-inner">
+    <div class="reveal" style="text-align:center">
+      <div class="section-label" style="justify-content:center">✦ Process</div>
+      <h2 class="section-title" style="text-align:center">How AgriBot Works</h2>
+      <p class="section-desc" style="margin:0 auto 56px;text-align:center">
+        Four simple steps from question to actionable farming advice.
+      </p>
+    </div>
+    <div class="steps-grid">
+      <div class="step reveal">
+        <div class="step-num">1</div>
+        <div class="step-title">Ask Your Question</div>
+        <div class="step-desc">Type a question about crops, pests, weather, soil, or markets in natural language.</div>
+      </div>
+      <div class="step reveal" style="transition-delay:.1s">
+        <div class="step-num">2</div>
+        <div class="step-title">RAG Retrieval</div>
+        <div class="step-desc">The system searches a curated agricultural knowledge base for the most relevant facts.</div>
+      </div>
+      <div class="step reveal" style="transition-delay:.2s">
+        <div class="step-num">3</div>
+        <div class="step-title">IBM Granite AI</div>
+        <div class="step-desc">Retrieved context is combined with your question and sent to IBM Granite for expert synthesis.</div>
+      </div>
+      <div class="step reveal" style="transition-delay:.3s">
+        <div class="step-num">4</div>
+        <div class="step-title">Actionable Advice</div>
+        <div class="step-desc">You receive clear, field-ready recommendations with sources — instantly on your device.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="section" id="benefits" style="background:linear-gradient(160deg,#071c0f,#0a1a2e)">
+  <div class="section-inner">
+    <div class="reveal" style="text-align:center">
+      <div class="section-label" style="justify-content:center;color:var(--green-300)">✦ Benefits</div>
+      <h2 class="section-title" style="color:#fff;text-align:center">Why Farmers Choose AgriBot</h2>
+      <p class="section-desc" style="color:rgba(255,255,255,.5);margin:0 auto 48px;text-align:center">
+        Real, measurable impact at every stage of the farming cycle.
+      </p>
+    </div>
+    <div class="benefits-grid">
+      <div class="benefit-card reveal">
+        <div class="benefit-icon">📉</div>
+        <div class="benefit-text">
+          <div class="b-title">Cut Input Costs</div>
+          <div class="b-desc">Precise fertilizer and water recommendations reduce waste by up to 35%, lowering your cost per hectare.</div>
+        </div>
+      </div>
+      <div class="benefit-card reveal" style="transition-delay:.08s">
+        <div class="benefit-icon">🌿</div>
+        <div class="benefit-text">
+          <div class="b-title">Increase Crop Yield</div>
+          <div class="b-desc">Timely pest intervention and optimised irrigation schedules help farmers achieve 15–25% higher yields.</div>
+        </div>
+      </div>
+      <div class="benefit-card reveal" style="transition-delay:.16s">
+        <div class="benefit-icon">⚡</div>
+        <div class="benefit-text">
+          <div class="b-title">Instant Expert Advice</div>
+          <div class="b-desc">No waiting for an agronomist — get expert-level guidance in seconds, any time, from any device.</div>
+        </div>
+      </div>
+      <div class="benefit-card reveal" style="transition-delay:.24s">
+        <div class="benefit-icon">📡</div>
+        <div class="benefit-text">
+          <div class="b-title">Data-Driven Decisions</div>
+          <div class="b-desc">Weather data, market prices, and soil models are combined for decisions backed by real-time information.</div>
+        </div>
+      </div>
+      <div class="benefit-card reveal" style="transition-delay:.32s">
+        <div class="benefit-icon">🔒</div>
+        <div class="benefit-text">
+          <div class="b-title">IBM Enterprise Security</div>
+          <div class="b-desc">Your farm data is protected by IBM Cloud's enterprise-grade security and data governance standards.</div>
+        </div>
+      </div>
+      <div class="benefit-card reveal" style="transition-delay:.40s">
+        <div class="benefit-icon">♻️</div>
+        <div class="benefit-text">
+          <div class="b-title">Sustainable Farming</div>
+          <div class="b-desc">Soil health monitoring and organic alternative recommendations support long-term land productivity.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="capabilities-section" id="capabilities">
+  <div class="section-inner">
+    <div class="reveal" style="text-align:center">
+      <div class="section-label" style="justify-content:center">✦ Technology</div>
+      <h2 class="section-title" style="text-align:center">AI Capabilities at a Glance</h2>
+      <p class="section-desc" style="margin:0 auto 48px;text-align:center">
+        Each capability is powered by the IBM watsonx AI stack.
+      </p>
+    </div>
+    <div class="cap-grid">
+      <div class="cap-card reveal"><div class="cc-icon">🌾</div><div class="cc-name">Crop Selection</div><div class="cc-tech">Granite · RAG</div></div>
+      <div class="cap-card reveal" style="transition-delay:.05s"><div class="cc-icon">💧</div><div class="cc-name">Irrigation</div><div class="cc-tech">Weather API · AI</div></div>
+      <div class="cap-card reveal" style="transition-delay:.1s"><div class="cc-icon">🌱</div><div class="cc-name">Fertilizer</div><div class="cc-tech">Granite · KB</div></div>
+      <div class="cap-card reveal" style="transition-delay:.15s"><div class="cc-icon">🐛</div><div class="cc-name">Pest Detection</div><div class="cc-tech">Vision · Granite</div></div>
+      <div class="cap-card reveal" style="transition-delay:.2s"><div class="cc-icon">🍄</div><div class="cc-name">Disease ID</div><div class="cc-tech">Image Upload</div></div>
+      <div class="cap-card reveal" style="transition-delay:.25s"><div class="cc-icon">🌤</div><div class="cc-name">Weather</div><div class="cc-tech">Open-Meteo</div></div>
+      <div class="cap-card reveal" style="transition-delay:.3s"><div class="cc-icon">📈</div><div class="cc-name">Market Prices</div><div class="cc-tech">Forecasting AI</div></div>
+      <div class="cap-card reveal" style="transition-delay:.35s"><div class="cc-icon">📋</div><div class="cc-name">Gov. Advisories</div><div class="cc-tech">RAG · KB</div></div>
+      <div class="cap-card reveal" style="transition-delay:.4s"><div class="cc-icon">🧪</div><div class="cc-name">Soil Health</div><div class="cc-tech">Analytics</div></div>
+      <div class="cap-card reveal" style="transition-delay:.45s"><div class="cc-icon">♻️</div><div class="cc-name">Sustainability</div><div class="cc-tech">Granite · Best Practices</div></div>
+      <div class="cap-card reveal" style="transition-delay:.5s"><div class="cc-icon">💬</div><div class="cc-name">Chat History</div><div class="cc-tech">Orchestrate</div></div>
+      <div class="cap-card reveal" style="transition-delay:.55s"><div class="cc-icon">🤖</div><div class="cc-name">Natural Language</div><div class="cc-tech">IBM Granite 3</div></div>
+    </div>
+  </div>
+</section>
+
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      
+      <div class="footer-brand">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:36px;height:36px;background:linear-gradient(135deg,var(--green-400),var(--teal-400));border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px">🌾</div>
+          <div class="fb-name">AI Smart Farming Agent</div>
+        </div>
+        <p class="fb-desc" style="margin-top:10px">
+          Your intelligent farming companion powered by IBM watsonx Orchestrate,
+          IBM Granite language models, and Retrieval-Augmented Generation.
+        </p>
+      </div>
+
+      
+      <div class="footer-col">
+        <h4>Features</h4>
+        <ul>
+          <li><a href="#assistant">Crop Advisory</a></li>
+          <li><a href="#assistant">Weather Forecast</a></li>
+          <li><a href="#assistant">Pest Detection</a></li>
+          <li><a href="#assistant">Fertilizer Advice</a></li>
+        </ul>
+      </div>
+
+      
+      <div class="footer-col">
+        <h4>Platform</h4>
+        <ul>
+          <li><a href="https://www.ibm.com/watsonx" target="_blank" rel="noopener">IBM watsonx</a></li>
+          <li><a href="https://www.ibm.com/granite" target="_blank" rel="noopener">IBM Granite</a></li>
+          <li><a href="https://cloud.ibm.com" target="_blank" rel="noopener">IBM Cloud</a></li>
+          <li><a href="https://open-meteo.com" target="_blank" rel="noopener">Open-Meteo</a></li>
+        </ul>
+      </div>
+
+      
+      <div class="footer-col">
+        <h4>Resources</h4>
+        <ul>
+          <li><a href="#how-it-works">How It Works</a></li>
+          <li><a href="#benefits">Benefits</a></li>
+          <li><a href="#capabilities">AI Capabilities</a></li>
+          <li><a href="#features">All Features</a></li>
+        </ul>
+      </div>
+    </div>
+
+    
+    <div class="footer-bottom">
+      <p>© 2025 AI Smart Farming Agent · Powered by IBM watsonx Orchestrate &amp; IBM Granite Models</p>
+      <div class="footer-tech">
+        <span class="tech-pill">IBM watsonx</span>
+        <span class="tech-pill">IBM Granite 3</span>
+        <span class="tech-pill">RAG</span>
+        <span class="tech-pill">FastAPI</span>
+        <span class="tech-pill">Open-Meteo</span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+
+
+
+
+
+
+<script>
+  window.wxOConfiguration = {
+    orchestrationID: "26f396f02ef148d9b1db66ec2f1c0c8f_2b2d68e9-fe40-4463-8d98-c6c0c8cfd788",
+    hostURL: "https://au-syd.watson-orchestrate.cloud.ibm.com",
+    rootElementID: "root",
+    deploymentPlatform: "ibmcloud",
+    crn: "crn:v1:bluemix:public:watsonx-orchestrate:au-syd:a/26f396f02ef148d9b1db66ec2f1c0c8f:2b2d68e9-fe40-4463-8d98-c6c0c8cfd788::",
+    chatOptions: {
+        agentId: "2cd94726-c254-4971-81ec-be3271b9c1f3",
+    }
+  };
+  setTimeout(function () {
+    const script = document.createElement('script');
+    script.src = `${window.wxOConfiguration.hostURL}/wxochat/wxoLoader.js?embed=true`;
+    script.addEventListener('load', function () {
+        wxoLoader.init();
+    });
+    document.head.appendChild(script);
+  }, 0);
+</script>
+
+</body>
+</html>
